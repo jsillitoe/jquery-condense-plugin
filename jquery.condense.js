@@ -72,9 +72,6 @@
   function cloneCondensed(elem, opts){
     // Try to clone and condense the element.  if not possible because of the length/minTrail options, return false.
     // also, dont count tag declarations as part of the text length.
-       $(document).ready(function(){
-          //example 1: using default options
-          $('#example1').condense();
     // check the length of the text first, return false if too short.
     if ($.trim(elem.text()).length <= opts.condensedLength + opts.minTrail){
       debug('element too short: skipping.');
