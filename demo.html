@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+
+    <style>
+
+      .test{
+        padding: 10px;
+        margin: 5px;
+      }
+
+      .condense_control{
+        color: blue;
+        font-weight: bold;
+      }
+
+      .condense_control:hover{
+        text-decoration: underline;
+      }
+
+    </style>
+
+    <!-- Required Scripts-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.condense.js"></script>
+
+    <!-- Optional Scripts-->
+    <script type="text/javascript" src="http://jqueryjs.googlecode.com/svn/trunk/plugins/metadata/jquery.metadata.js"></script>
+        <!--
+           Note:  In this demo, we are linking to the svn code for the metadata plugin.
+                  I *highly* reccomend that you don't do this on a production site.
+         -->
+
+
+    <!-- Implementation Examples -->
+    <script type="text/javascript">
+       
+       $(document).ready(function(){
+          //example 1: using default options
+          $('#example1').condense();
+
+          //example 2: expand 'fast', condense 'slow', and some other options
+          $('#example2').condense(
+            {    
+			        moreSpeed: 'fast',
+			        lessSpeed: 'slow',
+              moreText: 'show more',
+              lessText: 'show less',
+              ellipsis: " [there's more...]"
+            }
+          );
+
+          //example 4: condense a floated div
+          $('#example3').condense();
+
+          //example 4: just to show the plugin ignoring something too short to condense
+          $('#example4').condense();
+
+          //example 5: options for condensing a shorter element
+          $('#example5').condense(
+            { 
+              condensedLength: 40          
+            }
+          );
+
+          //example 6: condense a li element with metadata.
+          $('#example6').condense();
+       });
+
+
+
+
+    </script>
+
+  </head>
+  <body>
+
+    <h1>jQuery Condense Plugin Examples</h1>
+
+
+    <h3>Example 1:</h3>
+
+    <p id="example1" class="test" >
+      A simple paragraph, condensed with default options. Sed vel lorem nec nisi porttitor dictum. Morbi pede leo, 
+      dictum ut, mattis quis, aliquet ut, libero. Donec dui orci, rutrum cursus, 
+      convallis sed, auctor sed, tellus. Integer tortor nulla, tristique et, condimentum eu; 
+      tincidunt id, odio. Vestibulum rutrum odio luctus enim. Aenean massa risus, sollicitudin 
+      lobortis, lacinia quis, tincidunt in, purus. Vestibulum velit tortor, vestibulum et; 
+      dapibus et, ultricies ut, ante. Nullam et leo vel ligula scelerisque ultricies? Ut urna justo, 
+      tempor non, vestibulum vel, mollis eget, pede. Cras neque. Suspendisse eu odio. Aliquam dui 
+      pede; pharetra sed, sagittis ut, egestas quis, tellus. Vestibulum eu lacus. Sed eget enim. 
+    </p>
+
+
+    <h3>Example 2:</h3>
+
+    <div id="example2" style="width: 500px; background-color: gray; border: 1px solid black;" class="test" >
+          A styled div, with a couple of spans and links thrown in for good measure. 
+          Sed vel lorem nec nisi porttitor dictum. <span style="font-weight:bold;">Morbi <a href="#">pede leo, 
+          dictum ut, mattis quis, aliquet ut, libero</a>. Donec dui orci, rutrum cursus, 
+          convallis sed, auctor sed, tellus.</span> Integer tortor nulla, tristique et, condimentum eu; 
+          tincidunt id, odio. Vestibulum rutrum odio luctus enim. Aenean massa risus, sollicitudin 
+          lobortis, lacinia quis, tincidunt in, purus. Vestibulum velit tortor, vestibulum et; 
+          dapibus et, ultricies ut, ante. Nullam et leo vel ligula scelerisque ultricies? Ut urna justo, 
+          tempor non, vestibulum vel, mollis eget, pede. Cras neque. Suspendisse eu odio. Aliquam dui 
+          pede; pharetra sed, sagittis ut, egestas quis, tellus. Vestibulum eu lacus. Sed eget enim. 
+    </div>
+
+
+    <h3>Example 3:</h3>
+    <div style="clear:both;"></div>
+    <div id="example3" style="width: 500px; background-color: gray; border: 1px solid black; float:right;" class="test" >
+          A styled div, floated to the right, with a couple of spans and links thrown in for good measure. 
+          Sed vel lorem nec nisi porttitor dictum. <span style="font-weight:bold;">Morbi <a href="#">pede leo, 
+          dictum ut, mattis quis, aliquet ut, libero</a>. Donec dui orci, rutrum cursus, 
+          convallis sed, auctor sed, tellus.</span> Integer tortor nulla, tristique et, condimentum eu; 
+          tincidunt id, odio. Vestibulum rutrum odio luctus enim. Aenean massa risus, sollicitudin 
+          lobortis, lacinia quis, tincidunt in, purus. Vestibulum velit tortor, vestibulum et; 
+          dapibus et, ultricies ut, ante. Nullam et leo vel ligula scelerisque ultricies? Ut urna justo, 
+          tempor non, vestibulum vel, mollis eget, pede. Cras neque. Suspendisse eu odio. Aliquam dui 
+          pede; pharetra sed, sagittis ut, egestas quis, tellus. Vestibulum eu lacus. Sed eget enim. 
+    </div>
+    <div style="clear:both;"></div>
+
+
+    <h3>Example 4:</h3>
+    <div id="example3" style="width: 500px; background-color: gray; border: 1px solid black;" class="test" >
+        We tried to condense this div element, but it is too short.  The plugin will just leave it alone.
+        The minimum length is configureable in the options.  See example 5.
+    </div>
+
+
+    <h3>Example 5:</h3>
+    <div id="example5" style="width: 500px; background-color: gray; border: 1px solid black;" class="test" >
+        We can change options to condense shorter elements.  This example is shorter than the one above.
+    </div>
+
+
+    <h3>Example 6:</h3>
+    <ul class="test">
+      <li id="example6" class="somerandomclass { moreText: 'open sesame', lessText: 'close sesame'} anotherclass">
+        Not just for paragraphs and divs.  Here we are condensing a li element. Suspendisse eu odio. 
+        Aliquam dui pede; pharetra sed, sagittis ut, egestas quis, tellus.  Donec dui orci, rutrum cursus, convallis sed, auctor sed, tellus.
+        Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
+      </li>
+      <li>
+        <strong>Note:</strong>  The li used in example 5 is demonstrating support for the metadata plugin as well.
+      </li>
+    </ul>
+  </body>
+
+
+</html>
