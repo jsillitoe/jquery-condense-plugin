@@ -19,8 +19,9 @@
 *  minTrail: Minimun length of the trailing text. Default: 20
 *  delim: Delimiter used for finding the break point. Default: " " - {space}
 *  moreText: Text used for the more control. Default: [more]  
-*  lessText: Text used for the less control. Default: [less]  
+*  lessText: Text used for the less control, or null/empty for no less control. Default: [less]  
 *  ellipsis: Text added to condensed element. Default:  ( ... )  
+*  animate: True iff expanding and condensing should be animated. Default: true
 *  moreSpeed: Animation Speed for expanding. Default: "normal"  
 *  lessSpeed: Animation Speed for condensing. Default: "normal"
 *  easing: Easing algorith. Default: "linear"
@@ -51,9 +52,12 @@
         $this.attr('id') ? $this.attr('id','condensed_'+$this.attr('id')) : false;
 
         var controlMore = " <span class='condense_control condense_control_more' style='cursor:pointer;'>"+o.moreText+"</span>";
-        var controlLess = " <span class='condense_control condense_control_less' style='cursor:pointer;'>"+o.lessText+"</span>";
         clone.append(o.ellipsis + controlMore);
-        $this.after(clone).hide().append(controlLess);
+        $this.after(clone).hide()
+        if (o.lessText) {
+            var controlLess = " <span class='condense_control condense_control_less' style='cursor:pointer;'>"+o.lessText+"</span>";
+            $this.append(controlLess);
+        }
 
         $('.condense_control_more',clone).click(function(){
           debug('moreControl clicked.');
@@ -139,16 +143,21 @@
     var orig = control.parent(); // The original element will be the control's immediate parent.
     var condensed = orig.next(); // The condensed element will be the original immediate next sibling.    
     condensed.show();    
-    var con_w  = condensed.width();
-    var con_h = condensed.height();
-    condensed.hide(); //briefly flashed the condensed element so we can get the target width/height
-    var orig_w  = orig.width();
-    var orig_h = orig.height();
-    orig.animate({height:con_h, width:con_w, opacity: 1}, opts.lessSpeed, opts.easing,
-      function(){
-        orig.height(orig_h).width(orig_w).hide();
-        condensed.show(); 
-      });
+
+    if (opts.animate) {
+      var con_w  = condensed.width();
+      var con_h = condensed.height();
+      condensed.hide(); //briefly flashed the condensed element so we can get the target width/height
+      var orig_w  = orig.width();
+      var orig_h = orig.height();
+      orig.animate({height:con_h, width:con_w, opacity: 1}, opts.lessSpeed, opts.easing,
+        function(){
+          orig.height(orig_h).width(orig_w).hide();
+          condensed.show();
+        });
+    } else {
+      orig.hide();
+    }
   }
 
 
@@ -157,16 +166,21 @@
     var condensed = control.parent(); // The condensed element will be the control's immediate parent.
     var orig = condensed.prev(); // The original element will be the condensed immediate previous sibling.
     orig.show();
-    var orig_w  = orig.width();
-    var orig_h = orig.height();
-    orig.width(condensed.width()+"px").height(condensed.height()+"px"); 
-    condensed.hide();
-    orig.animate({height:orig_h, width:orig_w, opacity: 1}, opts.moreSpeed, opts.easing);
-    if(condensed.attr('id')){
-      var idAttr = condensed.attr('id');
-      condensed.attr('id','condensed_'+idAttr);
-      orig.attr('id',idAttr);
-    } 
+
+    if (opts.animate) {
+      var orig_w  = orig.width();
+      var orig_h = orig.height();
+      orig.width(condensed.width()+"px").height(condensed.height()+"px");
+      condensed.hide();
+      orig.animate({height:orig_h, width:orig_w, opacity: 1}, opts.moreSpeed, opts.easing);
+      if (condensed.attr('id')){
+        var idAttr = condensed.attr('id');
+        condensed.attr('id','condensed_'+idAttr);
+        orig.attr('id',idAttr);
+      }
+    } else {
+      condensed.hide();
+    }
   }
 
 
@@ -184,6 +198,7 @@
     moreText: "[more]",  
     lessText: "[less]",  
     ellipsis: " ( ... )",  
+    animate: true,
     moreSpeed: "normal",  
     lessSpeed: "normal",
     easing: "linear"
