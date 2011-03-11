@@ -52,7 +52,11 @@
 
         var controlMore = " <span class='condense_control condense_control_more' style='cursor:pointer;'>"+o.moreText+"</span>";
         var controlLess = " <span class='condense_control condense_control_less' style='cursor:pointer;'>"+o.lessText+"</span>";
-        clone.append(o.ellipsis + controlMore);
+        if (o.inline) {
+          clone.append(controlMore);
+        } else {
+          clone.append(o.ellipsis + controlMore);            
+        }
         $this.after(clone).hide().append(controlLess);
 
         $('.condense_control_more',clone).click(function(){
@@ -88,7 +92,11 @@
       // find the location of the next potential break-point.
       var loc = findDelimiterLocation(fullbody, opts.delim, (opts.condensedLength + delta));
       //set the html of the clone to the substring html of the original
-      clone.html($.trim(fullbody.substring(0,(loc+1))));
+      if (opts.inline) {
+        clone.html($.trim(fullbody.substring(0,(loc+1))) + ' ' + opts.ellipsis);
+      } else {
+        clone.html($.trim(fullbody.substring(0,(loc+1))));
+      }
       var cloneTextLength = clone.text().length;
       var cloneHtmlLength = clone.html().length;
       delta = clone.html().length - cloneTextLength; 
@@ -184,9 +192,10 @@
     moreText: "[more]",  
     lessText: "[less]",  
     ellipsis: " ( ... )",  
+    inline: true,
     moreSpeed: "normal",  
     lessSpeed: "normal",
-    easing: "linear"
+    easing: "linear",
   };
 
 })(jQuery);
