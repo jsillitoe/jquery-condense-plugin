@@ -94,7 +94,7 @@
       delta = clone.html().length - cloneTextLength; 
       debug ("condensing... [html-length:"+cloneHtmlLength+" text-length:"+cloneTextLength+" delta: "+delta+" break-point: "+loc+"]");
     //is the length of the clone text long enough?
-    }while(clone.text().length < opts.condensedLength )
+    }while(delta && clone.text().length < opts.condensedLength )
 
     //  after skipping ahead to the delimiter, do we still have enough trailing text?
     if ((fulltext.length - cloneTextLength) < opts.minTrail){
