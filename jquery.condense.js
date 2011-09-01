@@ -43,6 +43,9 @@
 	    var o = $.metadata ? $.extend({}, opts, $this.metadata()) : opts; // build element specific options
      
       debug('Condensing ['+$this.text().length+']: '+$this.text());
+
+      $this.wrap('<span class="condensedParent"></span>');
+      var $par = $this.parent();
       
       var clone = cloneCondensed($this,o);
 
@@ -53,19 +56,23 @@
         var controlMore = " <span class='condense_control condense_control_more' style='cursor:pointer;'>"+o.moreText+"</span>";
         var controlLess = " <span class='condense_control condense_control_less' style='cursor:pointer;'>"+o.lessText+"</span>";
         clone.append(o.ellipsis + controlMore);
-        $this.after(clone).hide().append(controlLess);
+        $par.append(clone);
+        $this.append(controlLess).hide();
 
         $('.condense_control_more',clone).click(function(){
           debug('moreControl clicked.');
+          $par.trigger('expand.condensePlugin');
           triggerExpand($(this),o)
         });
 
         $('.condense_control_less',$this).click(function(){
           debug('lessControl clicked.');
-          triggerCondense($(this),o)
+          $par.trigger('condense.condensePlugin');
         });
-      }
 
+        $par.bind('condense.condensePlugin', function() { triggerCondense($par,o) });
+        $par.bind('expand.condensePlugin',   function() { triggerExpand($par,o) });
+      }
 	  });
   };
 
@@ -134,38 +141,40 @@
   }
 
 
-  function triggerCondense(control, opts){
-    debug('Condense Trigger: '+control.html());  
-    var orig = control.parent(); // The original element will be the control's immediate parent.
+  function getElements(par){
+    var orig = par.children().first(); // The original element will be the first element in the parent
     var condensed = orig.next(); // The condensed element will be the original immediate next sibling.    
-    condensed.show();    
-    var con_w  = condensed.width();
-    var con_h = condensed.height();
-    condensed.hide(); //briefly flashed the condensed element so we can get the target width/height
-    var orig_w  = orig.width();
-    var orig_h = orig.height();
-    orig.animate({height:con_h, width:con_w, opacity: 1}, opts.lessSpeed, opts.easing,
+    return {orig: orig, condensed: condensed};
+  }
+
+  function triggerCondense(par, opts){
+    var elements = getElements(par);
+    elements.condensed.show();    
+    var con_w  = elements.condensed.width();
+    var con_h = elements.condensed.height();
+    elements.condensed.hide(); //briefly flashed the condensed element so we can get the target width/height
+    var orig_w  = elements.orig.width();
+    var orig_h = elements.orig.height();
+    elements.orig.animate({height:con_h, width:con_w, opacity: 1}, opts.lessSpeed, opts.easing,
       function(){
-        orig.height(orig_h).width(orig_w).hide();
-        condensed.show(); 
+        elements.orig.height(orig_h).width(orig_w).hide();
+        elements.condensed.show(); 
       });
   }
 
 
-  function triggerExpand(control, opts){
-    debug('Expand Trigger: '+control.html());    
-    var condensed = control.parent(); // The condensed element will be the control's immediate parent.
-    var orig = condensed.prev(); // The original element will be the condensed immediate previous sibling.
-    orig.show();
-    var orig_w  = orig.width();
-    var orig_h = orig.height();
-    orig.width(condensed.width()+"px").height(condensed.height()+"px"); 
-    condensed.hide();
-    orig.animate({height:orig_h, width:orig_w, opacity: 1}, opts.moreSpeed, opts.easing);
-    if(condensed.attr('id')){
-      var idAttr = condensed.attr('id');
-      condensed.attr('id','condensed_'+idAttr);
-      orig.attr('id',idAttr);
+  function triggerExpand(par, opts){
+    var elements = getElements(par);
+    elements.orig.show();
+    var orig_w  = elements.orig.width();
+    var orig_h = elements.orig.height();
+    elements.orig.width(elements.condensed.width()+"px").height(elements.condensed.height()+"px"); 
+    elements.condensed.hide();
+    elements.orig.animate({height:orig_h, width:orig_w, opacity: 1}, opts.moreSpeed, opts.easing);
+    if(elements.condensed.attr('id')){
+      var idAttr = elements.condensed.attr('id');
+      elements.condensed.attr('id','condensed_'+idAttr);
+      elements.orig.attr('id',idAttr);
     } 
   }
 
