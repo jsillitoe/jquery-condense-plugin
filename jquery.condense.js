@@ -70,8 +70,19 @@
           $par.trigger(o.lessEvent);
         });
 
-        $par.bind(o.lessEvent, function() { triggerCondense($par,o) });
-        $par.bind(o.moreEvent,   function() { triggerExpand($par,o) });
+        var isExpanded = false;
+        $par.bind(o.lessEvent, function() {
+          if(isExpanded) {
+            triggerCondense($par,o)
+            isExpanded = false;
+          }
+        });
+        $par.bind(o.moreEvent,   function() {
+          if(! isExpanded) {
+            triggerExpand($par,o)
+            isExpanded = true;
+          }
+        });
       }
 	  });
   };
