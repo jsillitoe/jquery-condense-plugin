@@ -62,7 +62,6 @@
         $('.condense_control_more',clone).click(function(){
           debug('moreControl clicked.');
           $par.trigger(o.moreEvent);
-          triggerExpand($(this),o)
         });
 
         $('.condense_control_less',$this).click(function(){
