@@ -61,17 +61,17 @@
 
         $('.condense_control_more',clone).click(function(){
           debug('moreControl clicked.');
-          $par.trigger('expand.condensePlugin');
+          $par.trigger(o.moreEvent);
           triggerExpand($(this),o)
         });
 
         $('.condense_control_less',$this).click(function(){
           debug('lessControl clicked.');
-          $par.trigger('condense.condensePlugin');
+          $par.trigger(o.lessEvent);
         });
 
-        $par.bind('condense.condensePlugin', function() { triggerCondense($par,o) });
-        $par.bind('expand.condensePlugin',   function() { triggerExpand($par,o) });
+        $par.bind(o.lessEvent, function() { triggerCondense($par,o) });
+        $par.bind(o.moreEvent,   function() { triggerExpand($par,o) });
       }
 	  });
   };
@@ -195,7 +195,9 @@
     ellipsis: " ( ... )",  
     moreSpeed: "normal",  
     lessSpeed: "normal",
-    easing: "linear"
+    easing: "linear",
+    moreEvent: 'expand.condensePlugin',
+    lessEvent: 'condense.condensePlugin'
   };
 
 })(jQuery);
