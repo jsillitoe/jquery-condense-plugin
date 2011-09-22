@@ -50,6 +50,10 @@
       var clone = cloneCondensed($this,o);
 
       if (clone){ 
+
+        clone.addClass(o.condensedClass);
+        $this.addClass(o.expandedClass);
+
         // id attribute switch.  make sure that the visible elem keeps the original id (if set).
         $this.attr('id') ? $this.attr('id','condensed_'+$this.attr('id')) : false;
 
@@ -192,7 +196,9 @@
   /**
    * private function for debugging
    */
-  function debug($obj) {if (window.console && window.console.log){window.console.log($obj);}};
+  function debug($obj) {
+      //if (window.console && window.console.log){window.console.log($obj);}
+  };
 
 
   // plugin defaults
@@ -207,7 +213,10 @@
     lessSpeed: "normal",
     easing: "linear",
     moreEvent: 'expand.condensePlugin',
-    lessEvent: 'condense.condensePlugin'
+    lessEvent: 'condense.condensePlugin',
+    condensedClass: '',
+    expandedClass:  '',
+    eventProxy: undefined
   };
 
 })(jQuery);
