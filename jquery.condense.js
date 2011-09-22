@@ -31,9 +31,9 @@
   // plugin definition
   $.fn.condense = function(options) {
     
-    $.metadata ? debug('metadata plugin detected') : debug('metadata plugin not present');//detect the metadata plugin?
-
     var opts = $.extend({}, $.fn.condense.defaults, options); // build main options before element iteration
+
+    $.metadata ? debug('metadata plugin detected', opts) : debug('metadata plugin not present', opts);//detect the metadata plugin?
 
     // iterate each matched element
     return this.each(function() {
@@ -42,7 +42,7 @@
       // support metadata plugin (v2.0)
 	    var o = $.metadata ? $.extend({}, opts, $this.metadata()) : opts; // build element specific options
      
-      debug('Condensing ['+$this.text().length+']: '+$this.text());
+      debug('Condensing ['+$this.text().length+']: '+$this.text(), opts);
 
       $this.wrap('<span class="condensedParent"></span>');
       var $par = $this.parent();
@@ -64,12 +64,12 @@
         $this.append(controlLess).hide();
 
         $('.condense_control_more',clone).click(function(){
-          debug('moreControl clicked.');
+          debug('moreControl clicked.', opts);
           $par.trigger(o.moreEvent);
         });
 
         $('.condense_control_less',$this).click(function(){
-          debug('lessControl clicked.');
+          debug('lessControl clicked.', opts);
           $par.trigger(o.lessEvent);
         });
 
@@ -95,7 +95,7 @@
     // also, dont count tag declarations as part of the text length.
     // check the length of the text first, return false if too short.
     if ($.trim(elem.text()).length <= opts.condensedLength + opts.minTrail){
-      debug('element too short: skipping.');
+      debug('element too short: skipping.', opts);
       return false;
     } 
 
@@ -119,11 +119,11 @@
 
     //  after skipping ahead to the delimiter, do we still have enough trailing text?
     if ((fulltext.length - cloneTextLength) < opts.minTrail){
-      debug('not enough trailing text: skipping.');
+      debug('not enough trailing text: skipping.', opts);
       return false;
     }
 
-    debug('clone condensed. [text-length:'+cloneTextLength+']');
+    debug('clone condensed. [text-length:'+cloneTextLength+']', opts);
     return clone;
   }
 
@@ -196,8 +196,8 @@
   /**
    * private function for debugging
    */
-  function debug($obj) {
-      //if (window.console && window.console.log){window.console.log($obj);}
+  function debug(str, opts) {
+      if (opts && opts.debug && window.console && window.console.log){window.console.log(str);}
   };
 
 
@@ -216,7 +216,8 @@
     lessEvent: 'condense.condensePlugin',
     condensedClass: '',
     expandedClass:  '',
-    eventProxy: undefined
+    eventProxy: undefined,
+    debug: true
   };
 
 })(jQuery);
