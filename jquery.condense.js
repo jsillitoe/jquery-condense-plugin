@@ -37,7 +37,7 @@
 
     // iterate each matched element
     return this.each(function() {
-	    $this = $(this);
+	    var $this = $(this);
 
       // support metadata plugin (v2.0)
 	    var o = $.metadata ? $.extend({}, opts, $this.metadata()) : opts; // build element specific options
