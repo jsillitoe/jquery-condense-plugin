@@ -24,6 +24,7 @@
 *  moreSpeed: Animation Speed for expanding. Default: "normal"  
 *  lessSpeed: Animation Speed for condensing. Default: "normal"
 *  easing: Easing algorith. Default: "linear"
+*  expandedWidth: Width of the expanded text (optional)
 */
 
 (function($) {
@@ -156,6 +157,9 @@
     debug('Expand Trigger: '+control.html());    
     var condensed = control.parent(); // The condensed element will be the control's immediate parent.
     var orig = condensed.prev(); // The original element will be the condensed immediate previous sibling.
+    if (opts.expandedWidth) {
+      orig.width(opts.expandedWidth);
+    }
     orig.show();
     var orig_w  = orig.width();
     var orig_h = orig.height();
