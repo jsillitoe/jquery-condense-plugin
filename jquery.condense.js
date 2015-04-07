@@ -58,12 +58,12 @@
 
         $('.condense_control_more',clone).click(function(){
           debug('moreControl clicked.');
-          triggerExpand($(this),o)
+          triggerExpand($(this),o);
         });
 
         $('.condense_control_less',$this).click(function(){
           debug('lessControl clicked.');
-          triggerCondense($(this),o)
+          triggerCondense($(this),o);
         });
       }
 
@@ -89,7 +89,7 @@
       // find the location of the next potential break-point.
       var loc = findDelimiterLocation(fullbody, opts.delim, (opts.condensedLength + delta));
       //set the html of the clone to the substring html of the original
-      clone.html($.trim(fullbody.substring(0,(loc+1))));
+      clone.html(fullbody.substring(0,(loc+1)));
       var cloneTextLength = clone.text().length;
       var cloneHtmlLength = clone.html().length;
       delta = clone.html().length - cloneTextLength; 
