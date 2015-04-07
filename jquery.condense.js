@@ -32,9 +32,9 @@
   // plugin definition
   $.fn.condense = function(options) {
     
-    $.metadata ? debug('metadata plugin detected') : debug('metadata plugin not present');//detect the metadata plugin?
-
     var opts = $.extend({}, $.fn.condense.defaults, options); // build main options before element iteration
+
+    $.metadata ? debug('metadata plugin detected', opts) : debug('metadata plugin not present', opts);//detect the metadata plugin?
 
     // iterate each matched element
     return this.each(function() {
@@ -43,34 +43,56 @@
       // support metadata plugin (v2.0)
 	    var o = $.metadata ? $.extend({}, opts, $this.metadata()) : opts; // build element specific options
      
-      debug('Condensing ['+$this.text().length+']: '+$this.text());
+      debug('Condensing ['+$this.text().length+']: '+$this.text(), opts);
+
+      $this.wrap('<span class="condensedParent"></span>');
+      var $par = $this.parent();
       
       var clone = cloneCondensed($this,o);
 
       if (clone){ 
+
+        clone.addClass(o.condensedClass);
+        $this.addClass(o.expandedClass);
+
         // id attribute switch.  make sure that the visible elem keeps the original id (if set).
         $this.attr('id') ? $this.attr('id','condensed_'+$this.attr('id')) : false;
 
         var controlMore = " <span class='condense_control condense_control_more' style='cursor:pointer;'>"+o.moreText+"</span>";
         var controlLess = " <span class='condense_control condense_control_less' style='cursor:pointer;'>"+o.lessText+"</span>";
+
         if (o.inline) {
           clone.append(controlMore);
         } else {
-          clone.append(o.ellipsis + controlMore);            
+          clone.append(o.ellipsis + controlMore);
         }
-        $this.after(clone).hide().append(controlLess);
+        $par.append(clone);
+        $this.append(controlLess).hide();
 
         $('.condense_control_more',clone).click(function(){
-          debug('moreControl clicked.');
-          triggerExpand($(this),o);
+          debug('moreControl clicked.', opts);
+          $par.trigger(o.moreEvent);
         });
 
         $('.condense_control_less',$this).click(function(){
-          debug('lessControl clicked.');
-          triggerCondense($(this),o);
+          debug('lessControl clicked.', opts);
+          $par.trigger(o.lessEvent);
+        });
+
+        var isExpanded = false;
+        $par.bind(o.lessEvent, function() {
+          if(isExpanded) {
+            triggerCondense($par,o)
+            isExpanded = false;
+          }
+        });
+        $par.bind(o.moreEvent,   function() {
+          if(! isExpanded) {
+            triggerExpand($par,o)
+            isExpanded = true;
+          }
         });
       }
-
 	  });
   };
 
@@ -79,7 +101,7 @@
     // also, dont count tag declarations as part of the text length.
     // check the length of the text first, return false if too short.
     if ($.trim(elem.text()).length <= opts.condensedLength + opts.minTrail){
-      debug('element too short: skipping.');
+      debug('element too short: skipping.', opts);
       return false;
     } 
 
@@ -107,11 +129,11 @@
 
     //  after skipping ahead to the delimiter, do we still have enough trailing text?
     if ((fulltext.length - cloneTextLength) < opts.minTrail){
-      debug('not enough trailing text: skipping.');
+      debug('not enough trailing text: skipping.', opts);
       return false;
     }
 
-    debug('clone condensed. [text-length:'+cloneTextLength+']');
+    debug('clone condensed. [text-length:'+cloneTextLength+']', opts);
     return clone;
   }
 
@@ -143,49 +165,50 @@
   }
 
 
-  function triggerCondense(control, opts){
-    debug('Condense Trigger: '+control.html());  
-    var orig = control.parent(); // The original element will be the control's immediate parent.
+  function getElements(par){
+    var orig = par.children().first(); // The original element will be the first element in the parent
     var condensed = orig.next(); // The condensed element will be the original immediate next sibling.    
-    condensed.show();    
-    var con_w  = condensed.width();
-    var con_h = condensed.height();
-    condensed.hide(); //briefly flashed the condensed element so we can get the target width/height
-    var orig_w  = orig.width();
-    var orig_h = orig.height();
-    orig.animate({height:con_h, width:con_w, opacity: 1}, opts.lessSpeed, opts.easing,
+    return {orig: orig, condensed: condensed};
+  }
+
+  function triggerCondense(par, opts){
+    var elements = getElements(par);
+    elements.condensed.show();    
+    var con_w  = elements.condensed.width();
+    var con_h = elements.condensed.height();
+    elements.condensed.hide(); //briefly flashed the condensed element so we can get the target width/height
+    var orig_w  = elements.orig.width();
+    var orig_h = elements.orig.height();
+    elements.orig.animate({height:con_h, width:con_w, opacity: 1}, opts.lessSpeed, opts.easing,
       function(){
-        orig.height(orig_h).width(orig_w).hide();
-        condensed.show(); 
+        elements.orig.height(orig_h).width(orig_w).hide();
+        elements.condensed.show(); 
       });
   }
 
 
-  function triggerExpand(control, opts){
-    debug('Expand Trigger: '+control.html());    
-    var condensed = control.parent(); // The condensed element will be the control's immediate parent.
-    var orig = condensed.prev(); // The original element will be the condensed immediate previous sibling.
-    if (opts.expandedWidth) {
-      orig.width(opts.expandedWidth);
+  function triggerExpand(par, opts){
+    var elements = getElements(par);
+    elements.orig.show();
+    var orig_w  = elements.orig.width();
+    var orig_h = elements.orig.height();
+    elements.orig.width(elements.condensed.width()+"px").height(elements.condensed.height()+"px"); 
+    elements.condensed.hide();
+    elements.orig.animate({height:orig_h, width:orig_w, opacity: 1}, opts.moreSpeed, opts.easing);
+    if(elements.condensed.attr('id')){
+      var idAttr = elements.condensed.attr('id');
+      elements.condensed.attr('id','condensed_'+idAttr);
+      elements.orig.attr('id',idAttr);
     }
-    orig.show();
-    var orig_w  = orig.width();
-    var orig_h = orig.height();
-    orig.width(condensed.width()+"px").height(condensed.height()+"px"); 
-    condensed.hide();
-    orig.animate({height:orig_h, width:orig_w, opacity: 1}, opts.moreSpeed, opts.easing);
-    if(condensed.attr('id')){
-      var idAttr = condensed.attr('id');
-      condensed.attr('id','condensed_'+idAttr);
-      orig.attr('id',idAttr);
-    } 
   }
 
 
   /**
    * private function for debugging
    */
-  function debug($obj) {if (window.console && window.console.log){window.console.log($obj);}};
+  function debug(str, opts) {
+      if (opts && opts.debug && window.console && window.console.log){window.console.log(str);}
+  }
 
 
   // plugin defaults
@@ -199,7 +222,13 @@
     inline: true,
     moreSpeed: "normal",  
     lessSpeed: "normal",
-    easing: "linear"
+    easing: "linear",
+    moreEvent: 'expand.condensePlugin',
+    lessEvent: 'condense.condensePlugin',
+    condensedClass: '',
+    expandedClass:  '',
+    eventProxy: undefined,
+    debug: true
   };
 
 })(jQuery);
