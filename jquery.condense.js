@@ -165,7 +165,9 @@
 
 
     function isInsideTag(html, loc){
-        return (html.indexOf('>',loc) < html.indexOf('<',loc));
+        var startTagIndex = html.indexOf('<', loc);
+        var endTagIndex = html.indexOf('>', loc);
+        return (startTagIndex === -1 && endTagIndex >0) || (endTagIndex < startTagIndex);
     }
 
 
